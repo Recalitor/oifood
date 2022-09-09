@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "884109506020",
+    "project_id": "oifood-13cca",
+    "storage_bucket": "oifood-13cca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:884109506020:android:deef624e5eaa74f85f83f1",
+        "android_client_info": {
+          "package_name": "gr.oifood.oifood"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "884109506020-ipqovubs4lbflgs0cqun1fbp3k1879vk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOKo4uv3pfwMowid_kpP98URZ0i4UkEzI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "884109506020-ipqovubs4lbflgs0cqun1fbp3k1879vk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
