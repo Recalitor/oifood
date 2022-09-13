@@ -5,7 +5,6 @@ import 'package:oifood/views/login_view.dart';
 import 'package:oifood/views/register_view.dart';
 import 'package:oifood/views/verify_email_view.dart';
 import 'package:oifood/firebase_options.dart';
-import 'dart:developer' as devtools show log;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +18,7 @@ void main() {
       routes: {
         '/login/': (context) => const LoginView(),
         '/register/': (context) => const RegisterView(),
+        '/oifood/': (context) => const OikadView(),
       },
     ),
   );
@@ -39,7 +39,7 @@ class HomePage extends StatelessWidget {
             final user = FirebaseAuth.instance.currentUser;
             if (user != null) {
               if (user.emailVerified) {
-                return const oikadView();
+                return const OikadView();
               } else {
                 return const verifyEmailView();
               }
@@ -57,14 +57,14 @@ class HomePage extends StatelessWidget {
 
 enum MenuAction { logout }
 
-class oikadView extends StatefulWidget {
-  const oikadView({super.key});
+class OikadView extends StatefulWidget {
+  const OikadView({super.key});
 
   @override
-  State<oikadView> createState() => _oikadViewState();
+  State<OikadView> createState() => _OikadViewState();
 }
 
-class _oikadViewState extends State<oikadView> {
+class _OikadViewState extends State<OikadView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +84,7 @@ class _oikadViewState extends State<oikadView> {
                     );
                   }
               }
-              devtools.log(value.toString());
+              // devtools.log(value.toString());
             },
             itemBuilder: (context) {
               return const [
