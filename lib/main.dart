@@ -20,6 +20,7 @@ void main() {
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
         oifoodRoute: (context) => const OikadView(),
+        verifyEmailRoute: (context) => const verifyEmailView(),
       },
     ),
   );
