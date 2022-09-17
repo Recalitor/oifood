@@ -1,6 +1,6 @@
-// import 'dart:html';
-import 'package:oifood/services/crud/crud_exceptions.dart';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:oifood/services/auth/crud/crud_exceptions.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -8,12 +8,50 @@ import 'package:sqflite/sqflite.dart';
 class OikadService {
   Database? _db;
 
+  //mporei axristo sindeetai me to allapofseis
+  List<DatabaseOifood> _oifood = [];
+
+  static final OikadService _shared = OikadService._sharedInstance();
+  OikadService._sharedInstance();
+  factory OikadService() => _shared;
+
+  final _oifoodStremController =
+      StreamController<List<DatabaseOifood>>.broadcast();
+
+  //mporei axristo
+  Stream<List<DatabaseOifood>> get allApofaseis =>
+      _oifoodStremController.stream;
+
+  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+    try {
+      final user = await getUser(email: email);
+      return user;
+    } on CouldNotFindUser {
+      final createdUser = await createUser(email: email);
+      return createdUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  //den xreiazetai
+  Future<void> _cacheOifood() async {
+    final allApofaseis = await getAllApofaseis();
+    _oifood = allApofaseis.toList();
+    _oifoodStremController.add(_oifood);
+  }
+
   Future<DatabaseOifood> updateApofasi({
     required DatabaseOifood apofasi,
     required int ap,
   }) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
+
+    //make sure apofasi exists
     await getApofasi(id: apofasi.id);
+
+    //update db
     final updatesCount = await db.update(oifoodTable, {
       apofasiColumn: ap,
       isSyncedWithCloudColumn: false,
@@ -22,21 +60,27 @@ class OikadService {
     if (updatesCount == 0) {
       throw CouldNotUpdateApofasi();
     } else {
-      return await getApofasi(id: apofasi.id);
+      final updateApofasi = await getApofasi(id: apofasi.id);
+      _oifood.removeWhere(
+          (apofasitouxristi) => apofasitouxristi.id == updateApofasi.id);
+      _oifood.add(updateApofasi);
+      _oifoodStremController.add(_oifood);
+      return updateApofasi;
     }
   }
 
   //den xreiazetai
-  // Future<Iterable<DatabaseOifood>> getAllApofaseis() async {
-  //   final db = _getDatabaseOrThrow();
-  //   final apofasi = await db.query(
-  //     oifoodTable,
-  //   );
-
-  //   return apofasi.map((a) => DatabaseOifood.fromRow(a));
-  // }
+  Future<Iterable<DatabaseOifood>> getAllApofaseis() async {
+    await _ensureDbIsOpen();
+    final db = _getDatabaseOrThrow();
+    final apofasi = await db.query(
+      oifoodTable,
+    );
+    return apofasi.map((a) => DatabaseOifood.fromRow(a));
+  }
 
   Future<DatabaseOifood> getApofasi({required int id}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final apofasi = await db.query(
       oifoodTable,
@@ -48,17 +92,26 @@ class OikadService {
     if (apofasi.isEmpty) {
       throw CouldNotFindApofasi();
     } else {
-      return DatabaseOifood.fromRow(apofasi.first);
+      final apofasitouxristi = DatabaseOifood.fromRow(apofasi.first);
+      _oifood.removeWhere((apofasitouxristi) => apofasitouxristi.id == id);
+      _oifood.add(apofasitouxristi);
+      _oifoodStremController.add(_oifood);
+      return apofasitouxristi;
     }
   }
 
   //den xreiazetai
-  // Future<int> deleteAllNotes() async {
-  //   final db = _getDatabaseOrThrow();
-  //   return await db.delete(oifoodTable);
-  // }
+  Future<int> deleteAllNotes() async {
+    await _ensureDbIsOpen();
+    final db = _getDatabaseOrThrow();
+    final numberOfDeletions = await db.delete(oifoodTable);
+    _oifood = [];
+    _oifoodStremController.add(_oifood);
+    return numberOfDeletions;
+  }
 
   Future<void> deleteApofasi({required int id}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       oifoodTable,
@@ -67,10 +120,16 @@ class OikadService {
     );
     if (deletedCount == 0) {
       throw CouldNotDeleteApofasi();
+    } else {
+      //gia streamcontroller
+
+      _oifood.removeWhere((oifood) => oifood.id == id);
+      _oifoodStremController.add(_oifood);
     }
   }
 
   Future<DatabaseOifood> createApofasi({required DatabaseUser owner}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     // make sure owner exists in db with correct id
     final dbUser = await getUser(email: owner.email);
@@ -93,10 +152,14 @@ class OikadService {
       apofasi: apofasi,
       isSyncedWithCloud: true,
     );
+    //epomenes dio grammes gia to stream controller
+    _oifood.add(oifood);
+    _oifoodStremController.add(_oifood);
     return oifood;
   }
 
   Future<DatabaseUser> getUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
       userTable,
@@ -113,6 +176,7 @@ class OikadService {
   }
 
   Future<DatabaseUser> createUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
       userTable,
@@ -134,6 +198,7 @@ class OikadService {
   }
 
   Future<void> deleteUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deleteCount = await db.delete(
       userTable,
@@ -164,6 +229,14 @@ class OikadService {
     }
   }
 
+  Future<void> _ensureDbIsOpen() async {
+    try {
+      await open();
+    } on DatabaseAlreadyOpenException {
+      //empty
+    }
+  }
+
   Future<void> open() async {
     if (_db != null) {
       throw DatabaseAlreadyOpenException();
@@ -177,6 +250,8 @@ class OikadService {
       await db.execute(createUserTable);
       //create the oifood table
       await db.execute(createOifoodTable);
+      //gia na kanoume  cash notes
+      await _cacheOifood();
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectory();
     }

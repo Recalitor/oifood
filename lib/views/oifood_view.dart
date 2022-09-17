@@ -1,17 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:oifood/services/auth/auth_service.dart';
-
+import 'package:oifood/services/auth/crud/oifood_service.dart';
+import 'package:path/path.dart';
+//import 'package:oifood/services/auth/crud/oifood_service.dart';
 import '../constants/routes.dart';
 import '../enums/menu_action.dart';
 
 class OikadView extends StatefulWidget {
-  const OikadView({super.key});
+  //const OikadView({super.key});
+  const OikadView({Key? key}) : super(key: key);
 
   @override
   State<OikadView> createState() => _OikadViewState();
 }
 
 class _OikadViewState extends State<OikadView> {
+  //late final OifoodService _oifoodService;
+  late final OikadService _oifoodService;
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+
+  @override
+  void initState() {
+    _oifoodService = OikadService();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _oifoodService.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +63,27 @@ class _OikadViewState extends State<OikadView> {
           )
         ],
       ),
-      body: const Text('sdf'),
+      body: FutureBuilder(
+        future: _oifoodService.getOrCreateUser(email: userEmail),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                stream: _oifoodService.allApofaseis,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return const Text('Waiting for all notes...');
+                    default:
+                      return const CircularProgressIndicator();
+                  }
+                },
+              );
+            default:
+              return const CircularProgressIndicator();
+          }
+        },
+      ),
     );
   }
 }
