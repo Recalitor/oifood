@@ -3,8 +3,8 @@ import 'package:oifood/services/auth/auth_service.dart';
 import 'package:oifood/services/auth/crud/oifood_service.dart';
 import 'package:path/path.dart';
 //import 'package:oifood/services/auth/crud/oifood_service.dart';
-import '../constants/routes.dart';
-import '../enums/menu_action.dart';
+import '../../constants/routes.dart';
+import '../../enums/menu_action.dart';
 
 class OikadView extends StatefulWidget {
   //const OikadView({super.key});
@@ -35,8 +35,14 @@ class _OikadViewState extends State<OikadView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Oifood'),
+        title: const Text('OiFood'),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(newXristisRoute);
+            },
+            icon: const Icon(Icons.add),
+          ),
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
               switch (value) {
