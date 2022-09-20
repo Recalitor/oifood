@@ -12,11 +12,16 @@ class OikadService {
   List<DatabaseOifood> _oifood = [];
 
   static final OikadService _shared = OikadService._sharedInstance();
-  OikadService._sharedInstance();
+  OikadService._sharedInstance() {
+    _oifoodStremController = StreamController<List<DatabaseOifood>>.broadcast(
+      onListen: () {
+        _oifoodStremController.sink.add(_oifood);
+      },
+    );
+  }
   factory OikadService() => _shared;
 
-  final _oifoodStremController =
-      StreamController<List<DatabaseOifood>>.broadcast();
+  late final StreamController<List<DatabaseOifood>> _oifoodStremController;
 
   //mporei axristo
   Stream<List<DatabaseOifood>> get allApofaseis =>

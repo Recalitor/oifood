@@ -26,12 +26,6 @@ class _OikadViewState extends State<OikadView> {
   }
 
   @override
-  void dispose() {
-    _oifoodService.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -80,7 +74,26 @@ class _OikadViewState extends State<OikadView> {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
                     case ConnectionState.active:
-                      return const Text('Waiting for all notes...');
+                      if (snapshot.hasData) {
+                        final allApofaseis =
+                            snapshot.data as List<DatabaseOifood>;
+                        return ListView.builder(
+                          itemCount: allApofaseis.length,
+                          itemBuilder: (context, index) {
+                            final apofasi = allApofaseis[index];
+                            return ListTile(
+                              title: Text(apofasi.toString()),
+                              //title: Text(apofasi.text,
+                              //maxLines:1,
+                              //softWrap:true,
+                              //overflow: TextOverflow.ellipsis,),
+                            );
+                          },
+                        );
+                      } else {
+                        return const CircularProgressIndicator();
+                      }
+
                     default:
                       return const CircularProgressIndicator();
                   }
