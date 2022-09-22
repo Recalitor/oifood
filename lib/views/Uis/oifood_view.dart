@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:oifood/services/auth/auth_service.dart';
 import 'package:oifood/services/auth/crud/oifood_service.dart';
+import 'package:oifood/views/Uis/oifood_list_view.dart';
 import 'package:path/path.dart';
 //import 'package:oifood/services/auth/crud/oifood_service.dart';
 import '../../constants/routes.dart';
 import '../../enums/menu_action.dart';
+import '../../utilities/dialogs/logout_dialog.dart';
 
 class OikadView extends StatefulWidget {
   //const OikadView({super.key});
@@ -77,17 +79,10 @@ class _OikadViewState extends State<OikadView> {
                       if (snapshot.hasData) {
                         final allApofaseis =
                             snapshot.data as List<DatabaseOifood>;
-                        return ListView.builder(
-                          itemCount: allApofaseis.length,
-                          itemBuilder: (context, index) {
-                            final apofasi = allApofaseis[index];
-                            return ListTile(
-                              title: Text(apofasi.toString()),
-                              //title: Text(apofasi.text,
-                              //maxLines:1,
-                              //softWrap:true,
-                              //overflow: TextOverflow.ellipsis,),
-                            );
+                        return OifoodListView(
+                          apofaseis: allApofaseis,
+                          onDeleteApofasi: (oifood) async {
+                            await _oifoodService.deleteApofasi(id: oifood.id);
                           },
                         );
                       } else {
@@ -106,30 +101,4 @@ class _OikadViewState extends State<OikadView> {
       ),
     );
   }
-}
-
-Future<bool> showLogOutDialog(BuildContext context) {
-  return showDialog<bool>(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Sign out'),
-        content: const Text('Are you sure you want to sign out?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
-            child: const Text('Log out'),
-          ),
-        ],
-      );
-    },
-  ).then((value) => value ?? false);
 }
