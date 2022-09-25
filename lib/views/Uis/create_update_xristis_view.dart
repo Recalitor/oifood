@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:oifood/services/auth/auth_service.dart';
 import 'package:oifood/services/auth/crud/oifood_service.dart';
+import 'package:oifood/utilities/dialogs/generics/get_arguments.dart';
 //ti tha vlepei o xristis
 
 //mporei se ola na einai oiffod kai oxi oikadService
 
-class NewXristisView extends StatefulWidget {
-  const NewXristisView({super.key});
+class CreateUpdateXristisView extends StatefulWidget {
+  const CreateUpdateXristisView({super.key});
 
   @override
-  State<NewXristisView> createState() => _NewXristisViewState();
+  State<CreateUpdateXristisView> createState() =>
+      _CreateUpdateXristisViewState();
 }
 
-class _NewXristisViewState extends State<NewXristisView> {
+class _CreateUpdateXristisViewState extends State<CreateUpdateXristisView> {
   DatabaseOifood? _oifood;
   late final OikadService _oikadService;
   late final TextEditingController _textEditingController;
@@ -42,7 +44,16 @@ class _NewXristisViewState extends State<NewXristisView> {
     //_textController.addListener(_textControllerListener);
   }
 
-  Future<DatabaseOifood> createNewNoteOrApofasi() async {
+  Future<DatabaseOifood> createOrGetExistingApofasi(
+      BuildContext context) async {
+    final widgetNote = context.getArgument<DatabaseOifood>();
+
+    if (widgetNote != null) {
+      _oifood = widgetNote;
+      //_textController.text = widgetNote.apofasi;
+      return widgetNote;
+    }
+
     final existingNoteorApofasi = _oifood;
     if (existingNoteorApofasi != null) {
       return existingNoteorApofasi;
@@ -50,7 +61,9 @@ class _NewXristisViewState extends State<NewXristisView> {
     final currentUser = AuthService.firebase().currentUser!;
     final email = currentUser.email!;
     final owner = await _oikadService.getUser(email: email);
-    return await _oikadService.createApofasi(owner: owner);
+    final newApofasi = await _oikadService.createApofasi(owner: owner);
+    _oifood = newApofasi;
+    return newApofasi;
   }
 
   //an patisei back kai gen kanei save
@@ -91,10 +104,10 @@ class _NewXristisViewState extends State<NewXristisView> {
         title: const Text('Neos Xristis'),
       ),
       body: FutureBuilder(
+        future: createOrGetExistingApofasi(context),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              _oifood = snapshot.data as DatabaseOifood;
               _setupTextControllerListener();
               return TextField(
                 //controller: _textController,

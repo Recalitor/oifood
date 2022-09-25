@@ -3,16 +3,18 @@ import 'package:oifood/services/auth/crud/oifood_service.dart';
 
 import '../../utilities/dialogs/delete_dialog.dart';
 
-typedef DeleteApofasiCallback = void Function(DatabaseOifood oifood);
+typedef ApofasiCallback = void Function(DatabaseOifood oifood);
 
 class OifoodListView extends StatelessWidget {
   final List<DatabaseOifood> apofaseis;
-  final DeleteApofasiCallback onDeleteApofasi;
+  final ApofasiCallback onDeleteApofasi;
+  final ApofasiCallback onTap;
 
   const OifoodListView({
     super.key,
     required this.apofaseis,
     required this.onDeleteApofasi,
+    required this.onTap,
   });
 
   @override

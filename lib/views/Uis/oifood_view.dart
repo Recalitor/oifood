@@ -35,7 +35,7 @@ class _OikadViewState extends State<OikadView> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(newXristisRoute);
+              Navigator.of(context).pushNamed(createOrUpdateXristisroute);
             },
             icon: const Icon(Icons.add),
           ),
@@ -83,6 +83,11 @@ class _OikadViewState extends State<OikadView> {
                           apofaseis: allApofaseis,
                           onDeleteApofasi: (oifood) async {
                             await _oifoodService.deleteApofasi(id: oifood.id);
+                          },
+                          onTap: (oifood) {
+                            Navigator.of(context).pushNamed(
+                                createOrUpdateXristisroute,
+                                arguments: oifood);
                           },
                         );
                       } else {

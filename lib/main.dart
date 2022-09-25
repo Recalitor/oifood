@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oifood/constants/routes.dart';
 import 'package:oifood/services/auth/auth_service.dart';
-import 'package:oifood/views/Uis/xristis_view.dart';
+import 'package:oifood/views/Uis/create_update_xristis_view.dart';
 import 'package:oifood/views/login_view.dart';
 import 'package:oifood/views/Uis/oifood_view.dart';
 import 'package:oifood/views/register_view.dart';
@@ -22,7 +22,8 @@ void main() {
         registerRoute: (context) => const RegisterView(),
         oifoodRoute: (context) => const OikadView(),
         verifyEmailRoute: (context) => const verifyEmailView(),
-        newXristisRoute: (context) => const NewXristisView(),
+        createOrUpdateXristisroute: (context) =>
+            const CreateUpdateXristisView(),
       },
     ),
   );
