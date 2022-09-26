@@ -24,6 +24,9 @@ class OifoodListView extends StatelessWidget {
       itemBuilder: (context, index) {
         final apofasi = apofaseis[index];
         return ListTile(
+          onTap: () {
+            onTap(apofasi);
+          },
           title: Text(apofasi.toString()),
           trailing: IconButton(
             onPressed: () async {

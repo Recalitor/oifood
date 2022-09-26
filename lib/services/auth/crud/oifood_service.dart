@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:oifood/extensions/list/filter.dart';
 import 'package:oifood/services/auth/crud/crud_exceptions.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
@@ -10,6 +11,8 @@ class OikadService {
 
   //mporei axristo sindeetai me to allapofseis
   List<DatabaseOifood> _oifood = [];
+
+  DatabaseUser? _user;
 
   static final OikadService _shared = OikadService._sharedInstance();
   OikadService._sharedInstance() {
@@ -25,14 +28,31 @@ class OikadService {
 
   //mporei axristo
   Stream<List<DatabaseOifood>> get allApofaseis =>
-      _oifoodStremController.stream;
+      _oifoodStremController.stream.filter((apofasiColumn) {
+        final currentUser = _user;
+        if (currentUser != null) {
+          return apofasiColumn.id == currentUser.id; //note.id
 
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+        } else {
+          throw UserShouldBeSetBeforeReadingAllApofaseis();
+        }
+      }); //note
+
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+  }) async {
     try {
       final user = await getUser(email: email);
+      if (setAsCurrentUser) {
+        _user = user;
+      }
       return user;
     } on CouldNotFindUser {
       final createdUser = await createUser(email: email);
+      if (setAsCurrentUser) {
+        _user = createdUser;
+      }
       return createdUser;
     } catch (e) {
       rethrow;
@@ -57,10 +77,15 @@ class OikadService {
     await getApofasi(id: apofasi.id);
 
     //update db
-    final updatesCount = await db.update(oifoodTable, {
-      apofasiColumn: ap,
-      isSyncedWithCloudColumn: false,
-    });
+    final updatesCount = await db.update(
+      oifoodTable,
+      {
+        apofasiColumn: ap,
+        isSyncedWithCloudColumn: 0,
+      },
+      where: 'id =?',
+      whereArgs: [apofasi.id],
+    );
 
     if (updatesCount == 0) {
       throw CouldNotUpdateApofasi();

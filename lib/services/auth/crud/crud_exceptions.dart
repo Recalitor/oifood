@@ -15,3 +15,5 @@ class CouldNotDeleteApofasi implements Exception {}
 class CouldNotFindApofasi implements Exception {}
 
 class CouldNotUpdateApofasi implements Exception {}
+
+class UserShouldBeSetBeforeReadingAllApofaseis implements Exception {}
