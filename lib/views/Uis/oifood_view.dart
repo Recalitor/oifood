@@ -1,29 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:oifood/services/auth/auth_service.dart';
-import 'package:oifood/services/auth/crud/oifood_service.dart';
+import 'package:oifood/services/cloud/cloud_note.dart';
+import 'package:oifood/services/cloud/firebase_cloud_storage.dart';
 import 'package:oifood/views/Uis/oifood_list_view.dart';
-import 'package:path/path.dart';
 //import 'package:oifood/services/auth/crud/oifood_service.dart';
 import '../../constants/routes.dart';
 import '../../enums/menu_action.dart';
 import '../../utilities/dialogs/logout_dialog.dart';
 
 class OikadView extends StatefulWidget {
-  //const OikadView({super.key});
-  const OikadView({Key? key}) : super(key: key);
+  const OikadView({super.key});
+  //const OikadView({Key? key}) : super(key: key);
 
   @override
-  State<OikadView> createState() => _OikadViewState();
+  //egw eixa to panw
+  //State<OikadView> createState() => _OikadViewState();
+  _OikadViewState createState() => _OikadViewState();
 }
 
 class _OikadViewState extends State<OikadView> {
   //late final OifoodService _oifoodService;
-  late final OikadService _oifoodService;
-  String get userEmail => AuthService.firebase().currentUser!.email;
+  late final FirebaseCloudStorage _oifoodService;
+  String get userId => AuthService.firebase().currentUser!.id;
 
   @override
   void initState() {
-    _oifoodService = OikadService();
+    _oifoodService = FirebaseCloudStorage();
     super.initState();
   }
 
@@ -59,46 +61,35 @@ class _OikadViewState extends State<OikadView> {
                 PopupMenuItem<MenuAction>(
                   value: MenuAction.logout,
                   child: Text('Log out'),
-                )
+                ),
               ];
             },
           )
         ],
       ),
-      body: FutureBuilder(
-        future: _oifoodService.getOrCreateUser(email: userEmail),
+      body: StreamBuilder(
+        stream: _oifoodService.allNotes(ownerUserId: userId),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return StreamBuilder(
-                stream: _oifoodService.allApofaseis,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                      if (snapshot.hasData) {
-                        final allApofaseis =
-                            snapshot.data as List<DatabaseOifood>;
-                        return OifoodListView(
-                          apofaseis: allApofaseis,
-                          onDeleteApofasi: (oifood) async {
-                            await _oifoodService.deleteApofasi(id: oifood.id);
-                          },
-                          onTap: (oifood) {
-                            Navigator.of(context).pushNamed(
-                                createOrUpdateXristisroute,
-                                arguments: oifood);
-                          },
-                        );
-                      } else {
-                        return const CircularProgressIndicator();
-                      }
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              if (snapshot.hasData) {
+                final allApofaseis = snapshot.data as Iterable<CloudNote>;
+                return OifoodListView(
+                  apofaseis: allApofaseis,
+                  onDeleteApofasi: (oifood) async {
+                    await _oifoodService.deleteNote(
+                        documentId: oifood.documentId);
+                  },
+                  onTap: (oifood) {
+                    Navigator.of(context).pushNamed(createOrUpdateXristisroute,
+                        arguments: oifood);
+                  },
+                );
+              } else {
+                return const CircularProgressIndicator();
+              }
 
-                    default:
-                      return const CircularProgressIndicator();
-                  }
-                },
-              );
             default:
               return const CircularProgressIndicator();
           }

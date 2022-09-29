@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:mynotes/services/cloud/cloud_storage_exceptions.dart';
 import 'package:oifood/services/auth/crud/crud_exceptions.dart';
 import 'package:oifood/services/auth/crud/oifood_service.dart';
+import 'package:oifood/services/cloud/cloud_storage_constants.dart';
+import 'package:oifood/services/cloud/cloud_storage_exceptions.dart';
 
 import 'cloud_note.dart';
 
@@ -39,11 +41,27 @@ class FirebaseCloudStorage {
     return allNotes;
   }
 
+  Future<Iterable<CloudNote>> getNotes({required String ownerUserId}) async {
+    try {
+      return await notes
+          .where(
+            ownerUserId,
+            isEqualTo: ownerUserId,
+          )
+          .get()
+          .then((value) => value.docs.map(
+                (doc) => CloudNote.fromSnapshot(doc),
+              ));
+    } catch (e) {
+      throw CouldNotGetAllApofasiException();
+    }
+  }
+
   Future<CloudNote> createNewNote({required String ownerUserId}) async {
     final document = await notes.add({
       ownerUserId: ownerUserId,
       //textFieldName: '',
-      apofasiColumn: 0,
+      intApofasiName: 0,
     });
     final fetchedNote = await document.get();
     return CloudNote(

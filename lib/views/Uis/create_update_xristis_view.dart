@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:oifood/services/auth/auth_service.dart';
-import 'package:oifood/services/auth/crud/oifood_service.dart';
 import 'package:oifood/utilities/dialogs/generics/get_arguments.dart';
+import 'package:oifood/services/cloud/cloud_note.dart';
+import 'package:oifood/services/cloud/cloud_storage_exceptions.dart';
+import 'package:oifood/services/cloud/firebase_cloud_storage.dart';
 //ti tha vlepei o xristis
 
 //mporei se ola na einai oiffod kai oxi oikadService
@@ -15,13 +17,13 @@ class CreateUpdateXristisView extends StatefulWidget {
 }
 
 class _CreateUpdateXristisViewState extends State<CreateUpdateXristisView> {
-  DatabaseOifood? _oifood;
-  late final OikadService _oikadService;
+  CloudNote? _oifood;
+  late final FirebaseCloudStorage _oikadService;
   late final TextEditingController _textEditingController;
 
   @override
   void initState() {
-    _oikadService = OikadService();
+    _oikadService = FirebaseCloudStorage();
     // _textController = TextEditingController();
     super.initState();
   }
@@ -32,10 +34,9 @@ class _CreateUpdateXristisViewState extends State<CreateUpdateXristisView> {
       return;
     }
     //final text = _textController.text;
-    await _oikadService.updateApofasi(
-      apofasi: apofasi,
-      ap: 3,
-      //ap: ap,
+    await _oikadService.updateNote(
+      documentId: apofasi.documentId,
+      text: 'agaien',
     );
   }
 
@@ -44,9 +45,8 @@ class _CreateUpdateXristisViewState extends State<CreateUpdateXristisView> {
     //_textController.addListener(_textControllerListener);
   }
 
-  Future<DatabaseOifood> createOrGetExistingApofasi(
-      BuildContext context) async {
-    final widgetNote = context.getArgument<DatabaseOifood>();
+  Future<CloudNote> createOrGetExistingApofasi(BuildContext context) async {
+    final widgetNote = context.getArgument<CloudNote>();
 
     if (widgetNote != null) {
       _oifood = widgetNote;
@@ -59,20 +59,19 @@ class _CreateUpdateXristisViewState extends State<CreateUpdateXristisView> {
       return existingNoteorApofasi;
     }
     final currentUser = AuthService.firebase().currentUser!;
-    final email = currentUser.email;
-    final owner = await _oikadService.getUser(email: email);
-    final newApofasi = await _oikadService.createApofasi(owner: owner);
-    _oifood = newApofasi;
+    final userId = currentUser.id;
+
+    final newApofasi = await _oikadService.createNewNote(ownerUserId: userId);
+    _oifood = newApofasi; // for storing the apofasi
     return newApofasi;
   }
 
   //an patisei back kai gen kanei save
   void _deleteApofasiIfApofasiIsEmpty() {
-    final apofasi = _oikadService;
+    final apofasi = _oifood;
     //if (_textController.text.isEmpty && apofasi != null) {
     if (apofasi != null) {
-      // _oikadService.deleteApofasi(id: apofasi.id);
-      _oikadService.deleteApofasi(id: 0);
+      _oikadService.deleteNote(documentId: apofasi.documentId);
     }
   }
 
@@ -81,10 +80,9 @@ class _CreateUpdateXristisViewState extends State<CreateUpdateXristisView> {
     //final text = _textController.text;
     // if (apofasi != null && text.isNotEmpty) {
     if (apofasi != null) {
-      await _oikadService.updateApofasi(
-        apofasi: apofasi,
-        //ap: text,
-        ap: 2,
+      await _oikadService.updateNote(
+        documentId: apofasi.documentId,
+        text: 'nothisdf',
       );
     }
   }

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:oifood/services/auth/crud/oifood_service.dart';
+import 'package:oifood/services/cloud/cloud_note.dart';
 
 import '../../utilities/dialogs/delete_dialog.dart';
 
-typedef ApofasiCallback = void Function(DatabaseOifood oifood);
+typedef ApofasiCallback = void Function(CloudNote oifood);
 
 class OifoodListView extends StatelessWidget {
-  final List<DatabaseOifood> apofaseis;
+  final Iterable<CloudNote> apofaseis;
   final ApofasiCallback onDeleteApofasi;
   final ApofasiCallback onTap;
 
@@ -22,7 +22,7 @@ class OifoodListView extends StatelessWidget {
     return ListView.builder(
       itemCount: apofaseis.length,
       itemBuilder: (context, index) {
-        final apofasi = apofaseis[index];
+        final apofasi = apofaseis.elementAt(index);
         return ListTile(
           onTap: () {
             onTap(apofasi);
