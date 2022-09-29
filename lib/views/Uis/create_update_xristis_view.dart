@@ -59,7 +59,7 @@ class _CreateUpdateXristisViewState extends State<CreateUpdateXristisView> {
       return existingNoteorApofasi;
     }
     final currentUser = AuthService.firebase().currentUser!;
-    final email = currentUser.email!;
+    final email = currentUser.email;
     final owner = await _oikadService.getUser(email: email);
     final newApofasi = await _oikadService.createApofasi(owner: owner);
     _oifood = newApofasi;

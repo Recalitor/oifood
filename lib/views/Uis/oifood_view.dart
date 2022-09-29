@@ -19,7 +19,7 @@ class OikadView extends StatefulWidget {
 class _OikadViewState extends State<OikadView> {
   //late final OifoodService _oifoodService;
   late final OikadService _oifoodService;
-  String get userEmail => AuthService.firebase().currentUser!.email!;
+  String get userEmail => AuthService.firebase().currentUser!.email;
 
   @override
   void initState() {
