@@ -4,6 +4,8 @@ import 'package:oifood/utilities/dialogs/generics/get_arguments.dart';
 import 'package:oifood/services/cloud/cloud_note.dart';
 import 'package:oifood/services/cloud/cloud_storage_exceptions.dart';
 import 'package:oifood/services/cloud/firebase_cloud_storage.dart';
+
+import '../../utilities/dialogs/cannot_share_empty_note_dialog.dart';
 //ti tha vlepei o xristis
 
 //mporei se ola na einai oiffod kai oxi oikadService
@@ -100,6 +102,16 @@ class _CreateUpdateXristisViewState extends State<CreateUpdateXristisView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Neos Xristis'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              // final text = _textController.text;
+              // if(_note==null|| text.isEmpty){
+              //   await showCannotShareEmptyNoteDialog(context);
+            },
+            icon: const Icon(Icons.share),
+          ),
+        ],
       ),
       body: FutureBuilder(
         future: createOrGetExistingApofasi(context),
