@@ -16,7 +16,7 @@ class FirebaseCloudStorage {
     try {
       await notes.doc(documentId).delete();
     } catch (e) {
-      throw CouldNotDeleteApofasi();
+      throw CouldNotDeleteApofasiException();
     }
   }
 
@@ -26,9 +26,9 @@ class FirebaseCloudStorage {
   }) async {
     try {
       //await notes.doc(documentId).update({textFieldName: text});
-      await notes.doc(documentId).update({apofasiColumn: text});
+      await notes.doc(documentId).update({intApofasiName: text});
     } catch (e) {
-      throw CouldNotUpdateApofasi();
+      throw CouldNotUpdateApofasiException();
     }
   }
 

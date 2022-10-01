@@ -104,10 +104,13 @@ class _CreateUpdateXristisViewState extends State<CreateUpdateXristisView> {
         title: const Text('Neos Xristis'),
         actions: [
           IconButton(
-            onPressed: () {
+            onPressed: () async {
               // final text = _textController.text;
               // if(_note==null|| text.isEmpty){
               //   await showCannotShareEmptyNoteDialog(context);
+              // }else{
+              //  Share.share(text);
+              // }
             },
             icon: const Icon(Icons.share),
           ),
