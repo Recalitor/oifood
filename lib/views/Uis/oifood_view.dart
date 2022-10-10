@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart' show ReadContext;
 import 'package:oifood/services/auth/auth_service.dart';
+import 'package:oifood/services/auth/bloc/auth_bloc.dart';
+import 'package:oifood/services/auth/bloc/auth_event.dart';
 import 'package:oifood/services/cloud/cloud_note.dart';
 import 'package:oifood/services/cloud/firebase_cloud_storage.dart';
 import 'package:oifood/views/Uis/oifood_list_view.dart';
@@ -47,11 +50,14 @@ class _OikadViewState extends State<OikadView> {
                 case MenuAction.logout:
                   final shouldLogout = await showLogOutDialog(context);
                   if (shouldLogout) {
-                    await AuthService.firebase().logOut();
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      loginRoute,
-                      (_) => false,
-                    );
+                    //await AuthService.firebase().logOut();
+                    context.read<AuthBloc>().add(
+                          const AuthEventLogOut(),
+                        );
+                    // Navigator.of(context).pushNamedAndRemoveUntil(
+                    //   loginRoute,
+                    //   (_) => false,
+                    // );
                   }
               }
               // devtools.log(value.toString());
