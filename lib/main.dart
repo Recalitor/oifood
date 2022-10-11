@@ -10,6 +10,7 @@ import 'package:oifood/views/login_view.dart';
 import 'package:oifood/views/Uis/oifood_view.dart';
 import 'package:oifood/views/register_view.dart';
 import 'package:oifood/views/verify_email_view.dart';
+import 'package:path/path.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,12 +25,14 @@ void main() {
         child: const HomePage(),
       ),
       routes: {
-        loginRoute: (context) => const LoginView(),
-        registerRoute: (context) => const RegisterView(),
-        oifoodRoute: (context) => const OikadView(),
-        verifyEmailRoute: (context) => const verifyEmailView(),
-        createOrUpdateXristisroute: (context) =>
-            const CreateUpdateXristisView(),
+        //we re supposed to remoive them
+        // loginRoute: (context) => const LoginView(),
+        // registerRoute: (context) => const RegisterView(),
+        // oifoodRoute: (context) => const OikadView(),
+        // verifyEmailRoute: (context) => const verifyEmailView(),
+        createOrUpdateXristisroute: (context) => const CreateUpdateXristisView()
+        //what he did
+        //createOrUpdateNoteroute:(context) => const CreateUpdateNoteView(),
       },
     ),
   );
@@ -49,6 +52,8 @@ class HomePage extends StatelessWidget {
           return const verifyEmailView();
         } else if (state is AuthStateLoggedOut) {
           return const LoginView();
+        } else if (state is AuthStateRegistering) {
+          return const RegisterView();
         } else {
           return const Scaffold(
             body: CircularProgressIndicator(),
@@ -57,41 +62,30 @@ class HomePage extends StatelessWidget {
       },
     );
   }
-} 
+}
 //useless fuyture builder now we have b;loc
-  //   return FutureBuilder(
-  //     future: AuthService.firebase().initialize(),
-  //     builder: (context, snapshot) {
-  //       switch (snapshot.connectionState) {
-  //         case ConnectionState.done:
-  //           final user = AuthService.firebase().currentUser;
-  //           if (user != null) {
-  //             if (user.isEmailVerifiedfalse) {
-  //               return const OikadView();
-  //             } else {
-  //               return const verifyEmailView();
-  //             }
-  //           } else {
-  //             return const LoginView();
-  //           }
+//   return FutureBuilder(
+//     future: AuthService.firebase().initialize(),
+//     builder: (context, snapshot) {
+//       switch (snapshot.connectionState) {
+//         case ConnectionState.done:
+//           final user = AuthService.firebase().currentUser;
+//           if (user != null) {
+//             if (user.isEmailVerifiedfalse) {
+//               return const OikadView();
+//             } else {
+//               return const verifyEmailView();
+//             }
+//           } else {
+//             return const LoginView();
+//           }
 
-  //         default:
-  //           return const CircularProgressIndicator();
-  //       }
-  //     },
-  //   );
-  // }
-
-
-
-
-
-
-
-
-
-
-
+//         default:
+//           return const CircularProgressIndicator();
+//       }
+//     },
+//   );
+// }
 
 //counterBloc page
 // class HomePage extends StatefulWidget {
