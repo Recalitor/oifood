@@ -4,7 +4,8 @@ import 'package:oifood/services/auth/bloc/auth_event.dart';
 import 'package:oifood/services/auth/bloc/auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc(AuthProvider provider) : super(const AuthStateUnintialized()) {
+  AuthBloc(AuthProvider provider)
+      : super(const AuthStateUnintialized(isLoading: true)) {
     //send email verification
     on<AuthEventSendEmailVerification>((event, emit) async {
       await provider.sendEmailVerification();
@@ -21,11 +22,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         await provider.sendEmailVerification();
         emit(
-          const AuthStateNeedsVerification(),
+          const AuthStateNeedsVerification(
+            isLoading: false,
+          ),
         );
       } on Exception catch (e) {
         emit(
-          AuthStateRegistering(e),
+          AuthStateRegistering(
+            exception: e,
+            isLoading: false,
+          ),
         );
       }
     });
@@ -41,9 +47,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           ),
         );
       } else if (!user.isEmailVerifiedfalse) {
-        emit(const AuthStateNeedsVerification());
+        emit(const AuthStateNeedsVerification(isLoading: false));
       } else {
-        emit(AuthStateLoggedIn(user));
+        emit(AuthStateLoggedIn(
+          user: user,
+          isLoading: false,
+        ));
       }
     });
     //log in
@@ -55,7 +64,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           isLoading: true,
         ),
       );
-      await Future.delayed(const Duration(seconds: 3));
+      //await Future.delayed(const Duration(seconds: 3));
       final email = event.email;
       final password = event.password;
       try {
@@ -67,11 +76,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (!user.isEmailVerifiedfalse) {
           emit(
             const AuthStateLoggedOut(
-              exception: null,
-              isLoading: false,
-            ),
+                exception: null,
+                isLoading: false,
+                loadingText: 'Please wait whi9le i log you in'),
           );
-          emit(const AuthStateNeedsVerification());
+          emit(const AuthStateNeedsVerification(isLoading: false));
         } else {
           emit(
             const AuthStateLoggedOut(
@@ -79,7 +88,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               isLoading: false,
             ),
           );
-          emit(AuthStateLoggedIn(user));
+          emit(AuthStateLoggedIn(
+            user: user,
+            isLoading: false,
+          ));
         }
       } on Exception catch (e) {
         emit(
