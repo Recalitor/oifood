@@ -7,6 +7,7 @@ import 'package:oifood/services/auth/bloc/auth_event.dart';
 import 'package:oifood/services/auth/bloc/auth_state.dart';
 import 'package:oifood/services/auth/firebase_auth_provider.dart';
 import 'package:oifood/views/Uis/create_update_xristis_view.dart';
+import 'package:oifood/views/forgot_password_view.dart';
 import 'package:oifood/views/login_view.dart';
 import 'package:oifood/views/Uis/oifood_view.dart';
 import 'package:oifood/views/register_view.dart';
@@ -61,6 +62,8 @@ class HomePage extends StatelessWidget {
           return const verifyEmailView();
         } else if (state is AuthStateLoggedOut) {
           return const LoginView();
+        } else if (state is AuthStateForgotPassword) {
+          return const ForgotPasswordView();
         } else if (state is AuthStateRegistering) {
           return const RegisterView();
         } else {
